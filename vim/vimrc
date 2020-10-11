@@ -1,0 +1,143 @@
+source $VIMRUNTIME/defaults.vim
+filetype plugin on
+filetype plugin indent on
+source ~/.config/vim/theme.vim
+
+set foldmethod=syntax
+set foldlevel=20
+set foldclose=all
+set nu
+set rnu
+set tabstop=4
+set nocp
+set clipboard=unnamedplus
+set wildmenu
+set hidden
+"set path+=**
+	
+
+"/////
+"//      Navigation
+"////
+source $VIMRUNTIME/plugin/new/pack/plugin/start/plugin/tmux_navigator.vim
+nnoremap <silent> <Esc><c-h> :set nosplitright<cr>:vert split<cr>
+nnoremap <silent> <Esc><c-j> :set splitbelow<cr>:split<cr>
+nnoremap <silent> <Esc><c-k> :set nosplitbelow<cr>:split<cr>
+nnoremap <silent> <Esc><c-l> :set splitright<cr>:vert split<cr>
+
+nnoremap <silent> <c-Left> :set nosplitright<cr>:vert split<cr>
+nnoremap <silent> <c-Down> :set splitbelow<cr>:split<cr>
+nnoremap <silent> <c-Up> :set nosplitbelow<cr>:split<cr>
+nnoremap <silent> <c-Right> :set splitright<cr>:vert split<cr>
+
+nnoremap <silent> <c-d> :q<cr>
+
+
+"/////
+"//     Searching
+"/////
+nnoremap <silent> <c-e> :Explore<cr>
+nnoremap <c-f> :silent grep! -I -i -r  %:p:h/*<Left><Left><Left><Left><Left><Left><Left><Left>
+
+augroup myvimrc
+    autocmd!
+    autocmd QuickFixCmdPost [^l]* cwindow | redraw! | wincmd j 
+    autocmd QuickFixCmdPost l*    lwindow | redraw! | wincmd j 
+augroup END
+:autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>:<Backspace>
+
+
+"/////
+"//    Programming
+"////
+source /usr/share/vim/vim82/plugin/new/NeoDebug/plugin/NeoDebug.vim
+source /usr/share/vim/vim82/plugin/new/NeoDebug/autoload/neodebug.vim
+source /usr/share/vim/vim82/plugin/new/NeoDebug/autoload/neodebug/gdb.vim
+source /usr/share/vim/vim82/plugin/new/NeoDebug/autoload/neodebug/lldb.vim
+source /usr/share/vim/vim82/plugin/new/NeoDebug/autoload/neodebug/pdb.vim
+source ~/.config/vim/avrdev.vim
+map <F5> :!ctags -R --c-kinds=+p --fields=+iaS --extra=+q --languages=c .  <CR>
+":se tags+=/usr/include/GL/tags
+:se tags+=~/.config/vim/tags/tags
+":se tags+=~/tags
+"au FileType c setl ofu=ccomplete#CompleteCpp
+"set omnifunc=syntaxcomplete#Complete
+"set completeopt+=preview
+function SDL2()
+  :read ~/.config/vim/templates/c_sdl2.c
+endfunction
+
+function Cmain()
+  :read ~/.config/vim/templates/skeleton.c
+endfunction
+
+
+function! Tagstuff(findstart,base)
+  let ret=[]
+  
+  "  :return  [a:base . '__1',a:base . '__2',a:base . '__3',a:base . '__4',a:base . '__5',]
+  if a:findstart
+    " locate the start of the word
+    let line = getline('.')
+    let start = col('.') - 1
+    while start > 0 && line[start - 1] =~ '\w'
+      let start -= 1
+    endwhile
+    return start
+  else
+	"echo "base: " . a:base
+  	let mytaglist=taglist('^' . a:base)
+    "echo mytaglist
+	"return
+	let i = 0
+
+	let prevname = ''
+	let prevmenu = ''
+	for mytag in mytaglist
+		
+		let name = mytag['name'] 
+		
+		let menu = mytag['kind'] 
+
+		if menu == 'F'
+			continue
+		endif
+
+		if has_key(mytag, 'typeref')
+			let menu = menu . ' 	' . split(mytag['typeref'],':')[1]
+		endif
+		if has_key(mytag, 'signature')
+			let menu = menu . ' 	' . mytag['signature']
+		elseif strlen(menu) == 1
+			let menu = menu . ' 	' . mytag['cmd']
+		endif
+		
+		if name == prevname
+			if menu == prevmenu
+				continue
+			endif
+			let name = ' ' .name
+		endif
+		
+
+		if i == 99
+			break
+		endif
+		let i = i + 1
+		
+		
+		let ret = ret + [{'word' : name , 'menu' : menu }]
+		
+		let prevname = name
+		let prevmenu = menu
+		
+		"let ret = ret + [name  . ' ' . menu . ' ' . info]
+
+	endfor
+  endif
+  return ret
+endfunction
+
+setlocal omnifunc=Tagstuff
+setlocal completefunc=Tagstuff
+"set showfulltag

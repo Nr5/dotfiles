@@ -1,0 +1,30 @@
+! -*- coding: utf-8 -*-
+! 2014-09-10
+! make caps lock do escape
+! from http://xahlee.info/
+
+! keycode   9 = Escape NoSymbol Escape
+! keycode  66 = Caps_Lock NoSymbol Caps_Lock
+
+clear Lock
+clear mod1
+keycode 64  = ISO_Level3_Shift Multi_key ISO_Level3_Shift Multi_key
+keycode 108 = Alt_L Meta_L Alt_L Meta_L 
+add mod1 = Alt_L Meta_L
+
+keycode 66  = Escape NoSymbol Escape
+keycode 43 = h H h H Left leftarrow 
+keycode 44 = j J j J Down downarrow
+keycode 45 = k K k K Up uparrow
+keycode 46 = l L l L Right rightarrow
+
+keycode 61 = slash question slash question Return
+keycode 30 = u U u U BackSpace uparrow downarrow uparrow
+keycode 32 = o O o O Delete THORN thorn THORN
+keycode 25 = w W w W Prior Lstroke lstroke Lstroke w W lstroke Lstroke
+keycode 39 = s S s S Next section ssharp section s S ssharp section
+
+
+
+
+keycode 134 = F9 F9 F9 
